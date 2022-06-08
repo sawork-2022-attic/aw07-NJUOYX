@@ -5,8 +5,8 @@ info:
   license:
     name: MIT
 paths:
-  /login:
-    post:
+  /login/{uid}:
+    get:
       summary: try to login
       operationId: login
       tags:
@@ -16,12 +16,6 @@ paths:
           in: path
           required: true
           description: The id of user
-          schema:
-            type: string
-        - name: password
-          in: path
-          required: true
-          description: The password of user
           schema:
             type: string
       responses:
@@ -43,7 +37,6 @@ components:
       type: object
       required:
         - uid
-        - password
       properties:
         uid:
           type: string

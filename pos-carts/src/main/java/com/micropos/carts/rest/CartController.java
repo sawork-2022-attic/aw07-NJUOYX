@@ -4,10 +4,16 @@ import com.micropos.carts.api.CartApi;
 import com.micropos.carts.dto.ItemDto;
 import com.micropos.carts.mapper.ItemMapper;
 import com.micropos.carts.service.CartService;
+import com.micropos.poscounter.dto.UserDto;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.client.circuitbreaker.CircuitBreaker;
+import org.springframework.cloud.client.circuitbreaker.CircuitBreakerFactory;
+import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,6 +23,17 @@ import java.util.List;
 public class CartController implements CartApi {
     private final ItemMapper itemMapper;
     private final CartService cartService;
+    @Autowired
+    private CircuitBreakerFactory circuitBreakerFactory;
+
+    @LoadBalanced
+    private RestTemplate restTemplate(){return new RestTemplate();}
+
+    private Boolean checkUser(String uid){
+        CircuitBreaker circuitBreaker = circuitBreakerFactory.create("checkUser");
+        String url = "http://localhost:6001/api/login/"+uid;
+        return circuitBreaker.run(()-> restTemplate().getForObject(url, UserDto.class) != null);
+    }
 
     public CartController(ItemMapper itemMapper, CartService cartService) {
         this.itemMapper = itemMapper;
@@ -24,7 +41,10 @@ public class CartController implements CartApi {
     }
 
     @Override
-    public ResponseEntity<List<ItemDto>> showCart(){
+    public ResponseEntity<List<ItemDto>> showCart(String uid){
+        if(!checkUser(uid)){
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
         List<ItemDto> items = new ArrayList<>(this.itemMapper.toItemsDto(this.cartService.getItems()));
         if(items.isEmpty()){
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -33,7 +53,10 @@ public class CartController implements CartApi {
     }
 
     @Override
-    public ResponseEntity<Boolean> addItemToCart(String productId){
+    public ResponseEntity<Boolean> addItemToCart(String productId, String uid){
+        if(!checkUser(uid)){
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
         Boolean res = this.cartService.addItem(productId);
         if(res == null){
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -42,11 +65,15 @@ public class CartController implements CartApi {
     }
 
     @Override
-    public ResponseEntity<Double> getTotal(){
+    public ResponseEntity<Double> getTotal(String uid){
+        if(!checkUser(uid)){
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
         Double res = this.cartService.getTotal();
         if(res == null){
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity<>(res, HttpStatus.OK);
     }
+
 }

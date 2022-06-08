@@ -15,6 +15,10 @@ spring:
           uri: lb://pos-cart
           predicates:
             - Path=/api/cart/**
+        - id: pos-counter
+          uri: lb://pos-counter
+          predicates:
+            - Path=/api/login/**
   main:
     web-application-type: reactive
 eureka:

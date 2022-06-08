@@ -2,7 +2,7 @@ server:
   port: 8083
 spring:
   application:
-    name: pos-cart
+    name: pos-counter
 
 eureka:
   client:
