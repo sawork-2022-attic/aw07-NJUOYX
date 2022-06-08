@@ -5,6 +5,9 @@ import com.micropos.carts.dto.ItemDto;
 import com.micropos.carts.mapper.ItemMapper;
 import com.micropos.carts.service.CartService;
 import com.micropos.poscounter.dto.UserDto;
+import com.micropos.poscounter.mapper.UserMapper;
+import com.micropos.poscounter.model.User;
+import com.micropos.posorder.model.Order;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.client.circuitbreaker.CircuitBreaker;
 import org.springframework.cloud.client.circuitbreaker.CircuitBreakerFactory;
@@ -23,7 +26,7 @@ import java.util.List;
 public class CartController implements CartApi {
     private final ItemMapper itemMapper;
     private final CartService cartService;
-    @Autowired
+    private UserMapper userMapper;
     private CircuitBreakerFactory circuitBreakerFactory;
 
     @LoadBalanced
@@ -33,6 +36,12 @@ public class CartController implements CartApi {
         CircuitBreaker circuitBreaker = circuitBreakerFactory.create("checkUser");
         String url = "http://localhost:6001/api/login/"+uid;
         return circuitBreaker.run(()-> restTemplate().getForObject(url, UserDto.class) != null);
+    }
+
+    private User getUser(String uid){
+        CircuitBreaker circuitBreaker = circuitBreakerFactory.create("checkUser");
+        String url = "http://localhost:6001/api/login/"+uid;
+        return circuitBreaker.run(()-> userMapper.toUser(restTemplate().getForObject(url, UserDto.class)));
     }
 
     public CartController(ItemMapper itemMapper, CartService cartService) {
@@ -61,6 +70,20 @@ public class CartController implements CartApi {
         if(res == null){
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+        return new ResponseEntity<>(res, HttpStatus.OK);
+    }
+
+    @Override
+    public ResponseEntity<Boolean> checkout(String uid) {
+        User user = getUser(uid);
+        if(user == null){
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+        CircuitBreaker circuitBreaker = circuitBreakerFactory.create("sendOrder");
+        String url = "http://localhost:6001/api/order";
+        Boolean res = circuitBreaker.run(()->
+                restTemplate().postForObject(
+                        url, new Order(user, cartService.getItems()),Boolean.class));
         return new ResponseEntity<>(res, HttpStatus.OK);
     }
 

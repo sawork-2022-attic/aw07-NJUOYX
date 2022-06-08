@@ -87,6 +87,32 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+  /cart/{uid}/checkout:
+    post:
+      summary: checkout the cart
+      operationId: checkout
+      tags:
+        - checkout
+      parameters:
+        - name: uid
+          in: path
+          required: true
+          description: The id of user
+          schema:
+            type: string
+      responses:
+        '200':
+          description: result of this opration
+          content:
+            application/json:
+              schema:
+                type: boolean
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
 
 components:
   schemas:
