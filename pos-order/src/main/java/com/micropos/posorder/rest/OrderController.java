@@ -1,8 +1,7 @@
 package com.micropos.posorder.rest;
 
-
-import com.micropos.poscounter.api.OrderApi;
-import com.micropos.poscounter.dto.OrderDto;
+import com.micropos.posorder.api.OrderApi;
+import com.micropos.posorder.dto.OrderDto;
 import com.micropos.posorder.mapper.OrderMapper;
 import com.micropos.posorder.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;

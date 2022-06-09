@@ -5,13 +5,7 @@
     <dependencies>
         <dependency>
             <groupId>com.micropos</groupId>
-            <artifactId>pos-products</artifactId>
-            <version>0.0.1</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.micropos</groupId>
-            <artifactId>pos-counter</artifactId>
+            <artifactId>pos-order</artifactId>
             <version>0.0.1</version>
             <scope>compile</scope>
         </dependency>
@@ -37,10 +31,10 @@
         <groupId>com.micropos</groupId>
         <version>0.0.1</version>
     </parent>
-    <artifactId>pos-order</artifactId>
+    <artifactId>pos-delivery</artifactId>
     <version>0.0.1</version>
-    <name>pos-order</name>
-    <description>pos-order</description>
+    <name>pos-delivery</name>
+    <description>pos-delivery</description>
 
     <build>
         <plugins>
@@ -55,8 +49,8 @@
                     <inputSpec>src/main/resources/api.yml</inputSpec>
                     <generatorName>spring</generatorName>
                     <modelNameSuffix>Dto</modelNameSuffix>
-                    <apiPackage>com.micropos.posorder.api</apiPackage>
-                    <modelPackage>com.micropos.posorder.dto</modelPackage>
+                    <apiPackage>com.micropos.posdelivery.api</apiPackage>
+                    <modelPackage>com.micropos.posdelivery.dto</modelPackage>
                 </configuration>
             </plugin>
         </plugins>

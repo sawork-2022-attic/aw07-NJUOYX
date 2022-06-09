@@ -3,6 +3,7 @@ package com.micropos.carts.rest;
 import com.micropos.carts.api.CartApi;
 import com.micropos.carts.dto.ItemDto;
 import com.micropos.carts.mapper.ItemMapper;
+import com.micropos.carts.model.Item;
 import com.micropos.carts.service.CartService;
 import com.micropos.poscounter.dto.UserDto;
 import com.micropos.poscounter.mapper.UserMapper;
@@ -27,6 +28,7 @@ public class CartController implements CartApi {
     private final ItemMapper itemMapper;
     private final CartService cartService;
     private UserMapper userMapper;
+    @Autowired
     private CircuitBreakerFactory circuitBreakerFactory;
 
     @LoadBalanced
@@ -83,7 +85,7 @@ public class CartController implements CartApi {
         String url = "http://localhost:6001/api/order";
         Boolean res = circuitBreaker.run(()->
                 restTemplate().postForObject(
-                        url, new Order(user, cartService.getItems()),Boolean.class));
+                        url, new Order<>(user, cartService.getItems()),Boolean.class));
         return new ResponseEntity<>(res, HttpStatus.OK);
     }
 

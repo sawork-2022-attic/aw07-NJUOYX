@@ -1,16 +1,15 @@
 package com.micropos.posorder.model;
 
-import com.micropos.carts.model.Item;
 import com.micropos.poscounter.model.User;
 
 import java.io.Serializable;
 import java.util.List;
 
-public class Order implements Serializable {
+public class Order<T> implements Serializable {
     private User user;
-    private List<Item> cart;
+    private List<T> cart;
 
-    public Order(User user, List<Item> cart) {
+    public Order(User user, List<T> cart) {
         this.user = user;
         this.cart = cart;
     }
@@ -26,11 +25,11 @@ public class Order implements Serializable {
         this.user = user;
     }
 
-    public List<Item> getCart() {
+    public List<T> getCart() {
         return cart;
     }
 
-    public void setCart(List<Item> cart) {
+    public void setCart(List<T> cart) {
         this.cart = cart;
     }
 }
